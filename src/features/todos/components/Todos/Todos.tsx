@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../../app/store';
-import { Todo, addTodo, removeTodo, updateTodo } from '../todosSlice';
+import { RootState } from '../../../../app/store';
+import { Todo, addTodo, removeTodo, updateTodo } from '../../todosSlice';
 import styles from './Todos.module.css';
 
 export const Todos: React.FC = () => {
@@ -32,7 +32,7 @@ export const Todos: React.FC = () => {
   };
 
   const handleToggleCompleted = (todo: Todo) => {
-    const updatedTodo = { ...todo, completed: !todo.isCompleted };
+    const updatedTodo = { ...todo, isCompleted: !todo.isCompleted };
     dispatch(updateTodo(updatedTodo));
   };
 
