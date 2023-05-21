@@ -4,6 +4,7 @@ import { RootState } from "../../../../app/store";
 import { startAuth, authSuccess, authFailure } from "../../authSlice";
 import styles from "./Login.module.css";
 import { Link } from "react-router-dom";
+import { LoginCredentials } from "../../authTypes";
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -24,10 +25,22 @@ export const Login: React.FC = () => {
         username: "exampleUser",
         email: email
       };
-      const token = "exampleAuthToken";
 
-      // Simulate a delay for loading state demonstration
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const loginCredentials: LoginCredentials = {
+        email: email,
+        password: password
+      };
+
+      const response = await fetch("http://localhost:5289/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify(loginCredentials),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      const parsedResponse = await response.json();
+      const token = parsedResponse.token;
 
       dispatch(authSuccess({ user, token }));
     } catch (err) {
