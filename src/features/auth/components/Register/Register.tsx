@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { RootState } from "../../../../app/store";
@@ -21,9 +21,11 @@ export const Register = () => {
   );
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
-  if (isAuthenticated) {
-    navigate("/");
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleConfirmPasswordBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     if (e.target.value !== password) {
