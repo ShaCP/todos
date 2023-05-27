@@ -4,15 +4,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { RootState } from "../../../../app/store";
 import { authFailure, authSuccess, startAuth } from "../../authSlice";
 import styles from "./Register.module.css";
+import { RegisterCredentials } from "../../authTypes";
 
 export const Register = () => {
-  const [username, setUsername] = useState("");
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const error = useSelector((state: RootState) => state.auth.error);
+  const errors = useSelector((state: RootState) => state.auth.errors);
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
@@ -22,6 +25,25 @@ export const Register = () => {
     navigate("/");
   }
 
+  const handleConfirmPasswordBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (e.target.value !== password) {
+      e.target.setCustomValidity("Passwords do not match");
+    } else {
+     // likely not needed but doesn't hurt
+      e.target.setCustomValidity("");
+    }
+
+    // e.target.reportValidity();
+  };
+
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    // Clear custom validity whenever user types in the field
+    e.target.setCustomValidity("");
+    setConfirmPassword(e.target.value);
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(startAuth());
@@ -29,24 +51,45 @@ export const Register = () => {
     // Implement your logic here to connect with the backend
     // If successful, update the state with the user's information and auth token
     try {
-      const user = {
-        username: username,
-        email: email
+      const user = { userName, email };
+
+      const registrationCredentials: RegisterCredentials = {
+        userName,
+        email,
+        password,
+        confirmPassword
       };
-      const token = "exampleAuthToken";
 
-      // Simulate a delay for loading state demonstration
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const response = await fetch("http://localhost:5289/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify(registrationCredentials),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
 
-      // Store the token in localStorage
-      localStorage.setItem("authToken", token);
+      if (response.status === 400) {
+        const errors = (await response.json()) as {
+          code: string;
+          description: string;
+        }[];
 
-      dispatch(authSuccess({ user, token }));
+        const errorDescriptions = errors.map((e) => e.description);
+
+        dispatch(authFailure(errorDescriptions));
+      } else if (response.status === 200) {
+        const parsedResponse = await response.json();
+        const token = parsedResponse.token;
+
+        // Store the token in localStorage
+        localStorage.setItem("authToken", token);
+        dispatch(authSuccess({ user, token }));
+      }
     } catch (err) {
       if (err instanceof Error) {
-        dispatch(authFailure(err.message));
+        dispatch(authFailure([err.message]));
       } else {
-        dispatch(authFailure("An unexpected error occurred."));
+        dispatch(authFailure(["An unexpected error occurred."]));
       }
     }
   };
@@ -57,8 +100,8 @@ export const Register = () => {
       <form onSubmit={handleRegister} className={styles.form}>
         <input
           type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
           className={styles.input}
           placeholder="Username"
           required
@@ -73,10 +116,21 @@ export const Register = () => {
         />
         <input
           type="password"
+          name="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className={styles.input}
           placeholder="Password"
+          required
+        />
+        <input
+          type="password"
+          name="confirmPassword"
+          value={confirmPassword}
+          onChange={handleConfirmPasswordChange}
+          onBlur={handleConfirmPasswordBlur}
+          className={styles.input}
+          placeholder="Confirm password"
           required
         />
         <button
@@ -92,8 +146,16 @@ export const Register = () => {
             Log In
           </Link>
         </p>
-
-        {error && <p className={styles.error}>{error}</p>}
+        {errors?.length &&
+          errors.map((error) => (
+            <p
+              className={styles.error}
+              key={error}
+              style={{ margin: "0.2rem 0" }}
+            >
+              {error}
+            </p>
+          ))}
       </form>
     </div>
   );

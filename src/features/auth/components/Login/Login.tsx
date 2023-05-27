@@ -12,7 +12,7 @@ export const Login: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const { isLoading, error } = useSelector((state: RootState) => state.auth);
+  const { isLoading, errors: error } = useSelector((state: RootState) => state.auth);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +22,7 @@ export const Login: React.FC = () => {
     // If successful, update the state with the user's information and auth token
     try {
       const user = {
-        username: "exampleUser",
+        userName: "exampleUser",
         email: email
       };
 
@@ -45,9 +45,9 @@ export const Login: React.FC = () => {
       dispatch(authSuccess({ user, token }));
     } catch (err) {
       if (err instanceof Error) {
-        dispatch(authFailure(err.message));
+        dispatch(authFailure([err.message]));
       } else {
-        dispatch(authFailure("An unexpected error occurred."));
+        dispatch(authFailure(["An unexpected error occurred."]));
       }
     }
   };
