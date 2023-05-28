@@ -5,6 +5,7 @@ import { startAuth, authSuccess, authFailure } from "../../authSlice";
 import styles from "./Login.module.css";
 import { Link } from "react-router-dom";
 import { LoginCredentials } from "../../authTypes";
+import { ErrorDisplay } from "../../../errorDisplay/components/ErrorDisplay/ErrorDisplay";
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ export const Login: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const { isLoading, errors: error } = useSelector((state: RootState) => state.auth);
+  const { isLoading, errors } = useSelector((state: RootState) => state.auth);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,14 +22,9 @@ export const Login: React.FC = () => {
     // Implement your logic here to connect with the backend
     // If successful, update the state with the user's information and auth token
     try {
-      const user = {
-        userName: "exampleUser",
-        email: email
-      };
-
       const loginCredentials: LoginCredentials = {
-        email: email,
-        password: password
+        email,
+        password
       };
 
       const response = await fetch("http://localhost:5289/api/auth/login", {
@@ -40,14 +36,15 @@ export const Login: React.FC = () => {
       });
 
       const parsedResponse = await response.json();
-      const token = parsedResponse.token;
+      const { token, userName, _email } = parsedResponse;
+      const user = { userName, email: _email };
 
       dispatch(authSuccess({ user, token }));
     } catch (err) {
       if (err instanceof Error) {
-        dispatch(authFailure([err.message]));
+        dispatch(authFailure(err.message));
       } else {
-        dispatch(authFailure(["An unexpected error occurred."]));
+        dispatch(authFailure("An unexpected error occurred."));
       }
     }
   };
@@ -85,7 +82,7 @@ export const Login: React.FC = () => {
             Register
           </Link>
         </p>
-        {error && <p className={styles.error}>{error}</p>}
+        {!!errors.length && <ErrorDisplay errors={errors} />}
       </form>
     </div>
   );

@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { RootState } from "../../../../app/store";
 import { authFailure, authSuccess, startAuth } from "../../authSlice";
 import styles from "./Register.module.css";
 import { RegisterCredentials } from "../../authTypes";
+import { ErrorResponse } from "../../../../types/apiTypes";
+import { ErrorDisplay } from "../../../errorDisplay/components/ErrorDisplay/ErrorDisplay";
 
 export const Register = () => {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,24 +31,14 @@ export const Register = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleConfirmPasswordBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (e.target.value !== password) {
-      e.target.setCustomValidity("Passwords do not match");
+  useEffect(() => {
+    if (confirmPassword?.length > 0 && confirmPassword !== password) {
+      confirmPasswordRef.current?.setCustomValidity("Passwords do not match");
+      confirmPasswordRef.current?.reportValidity();
     } else {
-     // likely not needed but doesn't hurt
-      e.target.setCustomValidity("");
+      confirmPasswordRef.current?.setCustomValidity("");
     }
-
-    // e.target.reportValidity();
-  };
-
-  const handleConfirmPasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    // Clear custom validity whenever user types in the field
-    e.target.setCustomValidity("");
-    setConfirmPassword(e.target.value);
-  };
+  }, [confirmPassword, password]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,11 +64,8 @@ export const Register = () => {
         }
       });
 
-      if (response.status === 400) {
-        const errors = (await response.json()) as {
-          code: string;
-          description: string;
-        }[];
+      if (!response.ok) {
+        const errors = (await response.json()) as ErrorResponse[];
 
         const errorDescriptions = errors.map((e) => e.description);
 
@@ -129,11 +120,11 @@ export const Register = () => {
           type="password"
           name="confirmPassword"
           value={confirmPassword}
-          onChange={handleConfirmPasswordChange}
-          onBlur={handleConfirmPasswordBlur}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           className={styles.input}
           placeholder="Confirm password"
           required
+          ref={confirmPasswordRef}
         />
         <button
           type="submit"
@@ -148,16 +139,7 @@ export const Register = () => {
             Log In
           </Link>
         </p>
-        {errors?.length &&
-          errors.map((error) => (
-            <p
-              className={styles.error}
-              key={error}
-              style={{ margin: "0.2rem 0" }}
-            >
-              {error}
-            </p>
-          ))}
+        {!!errors.length && <ErrorDisplay errors={errors} />}
       </form>
     </div>
   );
