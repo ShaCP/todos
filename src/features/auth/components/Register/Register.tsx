@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { RootState } from "../../../../app/store";
-import { authFailure, authSuccess, startAuth } from "../../authSlice";
+import { AppDispatch, RootState } from "../../../../app/store";
+import { register, clearErrors } from "../../authSlice";
 import styles from "./Register.module.css";
-import { RegisterCredentials } from "../../authTypes";
-import { ErrorResponse } from "../../../../types/apiTypes";
 import { ErrorDisplay } from "../../../errorDisplay/components/ErrorDisplay/ErrorDisplay";
 
 export const Register = () => {
@@ -16,7 +14,7 @@ export const Register = () => {
 
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
   const errors = useSelector((state: RootState) => state.auth.errors);
@@ -40,51 +38,26 @@ export const Register = () => {
     }
   }, [confirmPassword, password]);
 
+  useEffect(
+    () => () => {
+      dispatch(clearErrors());
+    },
+    []
+  );
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(startAuth());
-
     // Implement your logic here to connect with the backend
     // If successful, update the state with the user's information and auth token
-    try {
-      const user = { userName, email };
 
-      const registrationCredentials: RegisterCredentials = {
+    dispatch(
+      register({
         userName,
         email,
         password,
         confirmPassword
-      };
-
-      const response = await fetch("http://localhost:5289/api/auth/register", {
-        method: "POST",
-        body: JSON.stringify(registrationCredentials),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-
-      if (!response.ok) {
-        const errors = (await response.json()) as ErrorResponse[];
-
-        const errorDescriptions = errors.map((e) => e.description);
-
-        dispatch(authFailure(errorDescriptions));
-      } else if (response.status === 200) {
-        const parsedResponse = await response.json();
-        const token = parsedResponse.token;
-
-        // Store the token in localStorage
-        localStorage.setItem("authToken", token);
-        dispatch(authSuccess({ user, token }));
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        dispatch(authFailure([err.message]));
-      } else {
-        dispatch(authFailure(["An unexpected error occurred."]));
-      }
-    }
+      })
+    );
   };
 
   return (
