@@ -1,4 +1,4 @@
-export type ErrorResponse  = {
+export type ErrorResponse = {
     code?: string;
     description: string;
-  }
+};

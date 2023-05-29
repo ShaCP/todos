@@ -1,28 +1,11 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { User } from "../../types/User";
-import { ErrorMessage } from "../../types/commonTypes";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { LoginCredentials, RegisterCredentials } from "./authTypes";
-import { ErrorResponse } from "../../types/apiTypes";
-
-interface AuthState {
-  isAuthenticated: boolean;
-  user: User | null;
-  isLoading: boolean;
-  errors: string[];
-  authToken: string | null;
-}
-interface SuccessfulLoginResponse {
-  userName: string;
-  token: string;
-  email: string;
-}
-
-interface UserAndToken {
-  user: User;
-  token: string;
-}
-
-type AuthFailurePayload = ErrorMessage | ErrorMessage[];
+import { handleAuthSuccess } from "./handleAuthSuccess";
+import { handleAuthFailure } from "./handleAuthFailure";
+import { handleServerResponse } from "./handleServerResponse";
+import { AuthState } from "../../types/api/auth/AuthState";
+import { UserAndToken } from "../../types/api/auth/UserAndToken";
+import { AuthFailurePayload } from "../../types/api/auth/AuthFailurePayload";
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -31,55 +14,12 @@ const initialState: AuthState = {
   errors: [],
   authToken: null
 };
+enum AuthActionType {
+  LOGIN = "auth/login",
+  REGISTER = "auth/register"
+  // add other action types as needed
+}
 type AuthCredentials = LoginCredentials | RegisterCredentials;
-
-const handleAuthSuccess = (
-  state: AuthState,
-  action: PayloadAction<UserAndToken>
-) => {
-  state.isAuthenticated = true;
-  state.user = action.payload.user;
-  state.authToken = action.payload.token;
-  state.isLoading = false;
-};
-
-// Payload type may be undefined because this action type can't be properly inferred
-const handleAuthFailure = (
-  state: AuthState,
-  action: PayloadAction<AuthFailurePayload | undefined>
-) => {
-  if (action.payload !== undefined) {
-    const errors = Array.isArray(action.payload)
-      ? action.payload
-      : [action.payload];
-    state.errors = errors;
-    state.isLoading = false;
-  }
-};
-
-const handleServerResponse = async (
-  response: Response
-): Promise<UserAndToken> => {
-  const parsedResponse = await response.json();
-  if (response.ok) {
-    const { userName, email, token } =
-      parsedResponse as SuccessfulLoginResponse;
-    const user: User = { userName, email };
-
-    // Store the token in localStorage
-    localStorage.setItem("authToken", token);
-    return { user, token };
-  } else {
-    if (parsedResponse instanceof Array) {
-      const errors = parsedResponse as ErrorResponse[];
-      const errorDescriptions = errors.map((e) => e.description);
-      return Promise.reject(errorDescriptions);
-    } else {
-      const error = parsedResponse as ErrorResponse;
-      return Promise.reject(error.description);
-    }
-  }
-};
 
 const createAsyncAuthThunk = (url: string, type: string) =>
   createAsyncThunk<
@@ -113,12 +53,12 @@ const createAsyncAuthThunk = (url: string, type: string) =>
 
 export const login = createAsyncAuthThunk(
   "http://localhost:5289/api/auth/login",
-  "auth/login"
+  AuthActionType.LOGIN
 );
 
 export const register = createAsyncAuthThunk(
   "http://localhost:5289/api/auth/register",
-  "auth/register"
+  AuthActionType.REGISTER
 );
 
 export const authSlice = createSlice({
@@ -143,8 +83,18 @@ export const authSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(login.fulfilled, handleAuthSuccess);
     builder.addCase(login.rejected, handleAuthFailure);
+    builder.addCase(register.fulfilled, handleAuthSuccess);
+    builder.addCase(register.rejected, handleAuthFailure);
   }
 });
+
+async function postJSON(url: string, body: object): Promise<Response> {
+  return fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+}
 
 export const { startAuth, logout, clearErrors } = authSlice.actions;
 

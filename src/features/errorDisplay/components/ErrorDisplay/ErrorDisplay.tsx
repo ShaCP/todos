@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./ErrorDisplay.module.css";
-import { ErrorMessage } from "../../../../types/commonTypes";
+import { ErrorMessage } from "../../../../types/ErrorMessage";
 
 type ErrorProps = {
   errors: ErrorMessage[];
