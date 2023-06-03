@@ -1,6 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { UserAndToken } from "../../types/api/auth/UserAndToken";
-import { AuthState } from "../../types/api/auth/AuthState";
+import { UserAndToken } from "../../types/api/authTypes";
+import { AuthState } from "../../types/api/authTypes";
 
 export const handleAuthSuccess = (
     state: AuthState,

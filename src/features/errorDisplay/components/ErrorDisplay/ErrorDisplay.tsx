@@ -1,9 +1,9 @@
 import React from "react";
 import styles from "./ErrorDisplay.module.css";
-import { ErrorMessage } from "../../../../types/ErrorMessage";
+import { ErrorMessages } from "../../../../types/ErrorMessages";
 
 type ErrorProps = {
-  errors: ErrorMessage[];
+  errors: ErrorMessages;
 };
 
 const ErrorDisplay: React.FC<ErrorProps> = ({ errors }) => {

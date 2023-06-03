@@ -1,11 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { LoginCredentials, RegisterCredentials } from "./authTypes";
+import {
+  LoginCredentials,
+  RegisterCredentials
+} from "../../types/api/authTypes";
 import { handleAuthSuccess } from "./handleAuthSuccess";
 import { handleAuthFailure } from "./handleAuthFailure";
 import { handleServerResponse } from "./handleServerResponse";
-import { AuthState } from "../../types/api/auth/AuthState";
-import { UserAndToken } from "../../types/api/auth/UserAndToken";
-import { AuthFailurePayload } from "../../types/api/auth/AuthFailurePayload";
+import { AuthState } from "../../types/api/authTypes";
+import { UserAndToken } from "../../types/api/authTypes";
+import { ErrorMessages } from "../../types/ErrorMessages";
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -25,7 +28,7 @@ const createAsyncAuthThunk = (url: string, type: string) =>
   createAsyncThunk<
     UserAndToken,
     AuthCredentials,
-    { rejectValue: AuthFailurePayload }
+    { rejectValue: ErrorMessages }
   >(type, async (credentials, { dispatch, rejectWithValue }) => {
     dispatch(startAuth());
     try {
@@ -39,25 +42,61 @@ const createAsyncAuthThunk = (url: string, type: string) =>
 
       return await handleServerResponse(response);
     } catch (error) {
-      let errorMessage: AuthFailurePayload;
+      let errorMessages: ErrorMessages;
       if (error instanceof Error) {
-        errorMessage = error.message;
+        errorMessages = [error.message];
       } else if (Array.isArray(error)) {
-        errorMessage = error;
+        errorMessages = error;
+      } else if (typeof error === "string") {
+        errorMessages = [error];
       } else {
-        errorMessage = "An unknown error occurred.";
+        errorMessages = ["An unknown error occurred."];
       }
-      return rejectWithValue(errorMessage);
+
+      return rejectWithValue(errorMessages);
     }
   });
 
+//   const createAsyncAuthFromTokenThunk = (url: string, type: string) =>
+//   createAsyncThunk<
+//     UserAndToken,
+//     AuthCredentials,
+//     { rejectValue: ErrorMessages }
+//   >(type, async (credentials, { dispatch, rejectWithValue }) => {
+//     dispatch(startAuth());
+//     try {
+//       const response = await fetch(url, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify(credentials)
+//       });
+
+//       return await handleServerResponse(response);
+//     } catch (error) {
+//       let errorMessages: ErrorMessages;
+//       if (error instanceof Error) {
+//         errorMessages = [error.message];
+//       } else if (Array.isArray(error)) {
+//         errorMessages = error;
+//       } else if (typeof error === "string") {
+//         errorMessages = [error];
+//       } else {
+//         errorMessages = ["An unknown error occurred."];
+//       }
+
+//       return rejectWithValue(errorMessages);
+//     }
+//   });
+
 export const login = createAsyncAuthThunk(
-  "http://localhost:5289/api/auth/login",
+  `${process.env.REACT_APP_API_URL}/${AuthActionType.LOGIN}`,
   AuthActionType.LOGIN
 );
 
 export const register = createAsyncAuthThunk(
-  "http://localhost:5289/api/auth/register",
+  `${process.env.REACT_APP_API_URL}/${AuthActionType.REGISTER}`,
   AuthActionType.REGISTER
 );
 
@@ -78,7 +117,8 @@ export const authSlice = createSlice({
     },
     clearErrors: (state) => {
       state.errors = [];
-    }
+    },
+    authSuccess: handleAuthSuccess,
   },
   extraReducers: (builder) => {
     builder.addCase(login.fulfilled, handleAuthSuccess);
@@ -88,14 +128,14 @@ export const authSlice = createSlice({
   }
 });
 
-async function postJSON(url: string, body: object): Promise<Response> {
-  return fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
-}
+// async function postJSON(url: string, body: object): Promise<Response> {
+//   return fetch(url, {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(body)
+//   });
+// }
 
-export const { startAuth, logout, clearErrors } = authSlice.actions;
+export const { startAuth, logout, clearErrors, authSuccess } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;

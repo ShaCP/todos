@@ -1,7 +1,7 @@
 import { User } from "../../types/User";
 import { ErrorResponse } from "../../types/api/ErrorResponse";
-import { UserAndToken } from "../../types/api/auth/UserAndToken";
-import { SuccessfulLoginResponse } from "../../types/api/auth/SuccessfulLoginResponse";
+import { UserAndToken } from "../../types/api/authTypes";
+import { SuccessfulLoginResponse } from "../../types/api/authTypes";
 
 export const handleServerResponse = async (
     response: Response

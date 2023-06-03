@@ -19,7 +19,18 @@ export const Login: React.FC = () => {
     []
   );
 
+//   useEffect(
+//     () => {
+//       if (localStorage.getItem("authToken")) {
+//         dispatch(        
+//       }
+//     },
+//     []
+//   );
+
   const { isLoading, errors } = useSelector((state: RootState) => state.auth);
+
+//   if (authToken) {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
