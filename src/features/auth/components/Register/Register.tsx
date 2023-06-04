@@ -32,7 +32,7 @@ export const Register = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigate("/todos");
       resetForm();
     }
   }, [isAuthenticated, navigate]);
