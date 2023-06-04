@@ -9,4 +9,5 @@ export const handleAuthSuccess = (
     state.authToken = action.payload.token;
     state.isLoading = false;
     state.user = action.payload.user;
+    state.errors = [];
 };

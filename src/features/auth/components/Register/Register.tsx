@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
 import { Link, useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../../../app/store";
 import { register, clearErrors } from "../../authSlice";
@@ -14,18 +14,26 @@ export const Register = () => {
 
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch: AppDispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const errors = useSelector((state: RootState) => state.auth.errors);
-  const isAuthenticated = useSelector(
+  const errors = useAppSelector((state: RootState) => state.auth.errors);
+  const isAuthenticated = useAppSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
-  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const isLoading = useAppSelector((state: RootState) => state.auth.isLoading);
+
+  const resetForm = () => {
+    setUserName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/");
+      resetForm();
     }
   }, [isAuthenticated, navigate]);
 
@@ -41,6 +49,7 @@ export const Register = () => {
   useEffect(
     () => () => {
       dispatch(clearErrors());
+      resetForm();
     },
     []
   );
