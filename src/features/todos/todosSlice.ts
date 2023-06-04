@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { login } from "../auth/authSlice";
 
 export interface Todo {
   id: number;
@@ -10,7 +11,7 @@ export interface Todo {
 const initialState: Todo[] = [];
 
 const todosSlice = createSlice({
-  name: 'todos',
+  name: "todos",
   initialState,
   reducers: {
     addTodo: (state, action: PayloadAction<Todo>) => {
@@ -25,9 +26,12 @@ const todosSlice = createSlice({
         state[index] = action.payload;
       }
     },
-  },
+    setTodos: (_, action: PayloadAction<Todo[]>) => {
+      return action.payload;
+    }
+  }
 });
 
-export const { addTodo, removeTodo, updateTodo } = todosSlice.actions;
+export const { addTodo, removeTodo, updateTodo, setTodos } = todosSlice.actions;
 
 export default todosSlice.reducer;

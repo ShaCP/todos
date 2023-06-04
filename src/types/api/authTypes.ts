@@ -1,3 +1,4 @@
+import { Todo } from "../../features/todos/todosSlice";
 import { ErrorMessages } from "../ErrorMessages";
 import { User } from "../User";
 
@@ -15,16 +16,17 @@ export interface LoginCredentials {
 
 export interface AuthState {
   isAuthenticated: boolean;
-  user: User | null;
   isLoading: boolean;
   errors: ErrorMessages;
+  user: User | null;
   authToken: string | null;
 }
 
-export interface SuccessfulLoginResponse {
+export interface SuccessfulAuthResponse {
   userName: string;
   token: string;
   email: string;
+  todos: Todo[];
 }
 
 export interface UserAndToken {

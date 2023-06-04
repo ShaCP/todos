@@ -9,22 +9,22 @@ import { handleServerResponse } from "./handleServerResponse";
 import { AuthState } from "../../types/api/authTypes";
 import { UserAndToken } from "../../types/api/authTypes";
 import { ErrorMessages } from "../../types/ErrorMessages";
+import { setTodos } from "../todos/todosSlice";
 
 const initialState: AuthState = {
   isAuthenticated: false,
-  user: null,
   isLoading: false,
   errors: [],
+  user: null,
   authToken: null
 };
-enum AuthActionType {
+export enum AuthActionType {
   LOGIN = "auth/login",
   REGISTER = "auth/register"
-  // add other action types as needed
 }
 type AuthCredentials = LoginCredentials | RegisterCredentials;
 
-const createAsyncAuthThunk = (url: string, type: string) =>
+const createAsyncAuthThunk = (url: string, type: AuthActionType) =>
   createAsyncThunk<
     UserAndToken,
     AuthCredentials,
@@ -40,7 +40,14 @@ const createAsyncAuthThunk = (url: string, type: string) =>
         body: JSON.stringify(credentials)
       });
 
-      return await handleServerResponse(response);
+      const { userName, email, token, todos } = await handleServerResponse(
+        response
+      );
+
+      dispatch(setTodos(todos));
+      
+      const user = { userName, email };
+      return { user, token };
     } catch (error) {
       let errorMessages: ErrorMessages;
       if (error instanceof Error) {
@@ -111,14 +118,13 @@ export const authSlice = createSlice({
 
     logout: (state) => {
       state.isAuthenticated = false;
-      state.user = null;
       state.authToken = null;
       state.errors = [];
+      state.user = null;
     },
     clearErrors: (state) => {
       state.errors = [];
-    },
-    authSuccess: handleAuthSuccess,
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(login.fulfilled, handleAuthSuccess);
@@ -136,6 +142,6 @@ export const authSlice = createSlice({
 //   });
 // }
 
-export const { startAuth, logout, clearErrors, authSuccess } = authSlice.actions;
+export const { startAuth, logout, clearErrors } = authSlice.actions;
 
 export const authReducer = authSlice.reducer;
