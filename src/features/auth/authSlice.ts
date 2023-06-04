@@ -24,6 +24,20 @@ export enum AuthActionType {
 }
 type AuthCredentials = LoginCredentials | RegisterCredentials;
 
+const handleError = (error: any): ErrorMessages => {
+  let errorMessages: ErrorMessages;
+  if (error instanceof Error) {
+    errorMessages = [error.message];
+  } else if (Array.isArray(error)) {
+    errorMessages = error;
+  } else if (typeof error === "string") {
+    errorMessages = [error];
+  } else {
+    errorMessages = ["An unknown error occurred."];
+  }
+  return errorMessages;
+};
+
 const createAsyncAuthThunk = (url: string, type: AuthActionType) =>
   createAsyncThunk<
     UserAndToken,
@@ -45,21 +59,11 @@ const createAsyncAuthThunk = (url: string, type: AuthActionType) =>
       );
 
       dispatch(setTodos(todos));
-      
+
       const user = { userName, email };
       return { user, token };
     } catch (error) {
-      let errorMessages: ErrorMessages;
-      if (error instanceof Error) {
-        errorMessages = [error.message];
-      } else if (Array.isArray(error)) {
-        errorMessages = error;
-      } else if (typeof error === "string") {
-        errorMessages = [error];
-      } else {
-        errorMessages = ["An unknown error occurred."];
-      }
-
+      const errorMessages = handleError(error);
       return rejectWithValue(errorMessages);
     }
   });
