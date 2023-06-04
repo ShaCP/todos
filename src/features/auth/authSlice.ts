@@ -10,6 +10,8 @@ import { AuthState } from "../../types/api/authTypes";
 import { UserAndToken } from "../../types/api/authTypes";
 import { ErrorMessages } from "../../types/ErrorMessages";
 import { setTodos } from "../todos/todosSlice";
+import { handleError } from "../../utilities/errorHandling";
+import { ErrorType } from "../../constants/errors";
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -24,20 +26,6 @@ export enum AuthActionType {
 }
 type AuthCredentials = LoginCredentials | RegisterCredentials;
 
-const handleError = (error: any): ErrorMessages => {
-  let errorMessages: ErrorMessages;
-  if (error instanceof Error) {
-    errorMessages = [error.message];
-  } else if (Array.isArray(error)) {
-    errorMessages = error;
-  } else if (typeof error === "string") {
-    errorMessages = [error];
-  } else {
-    errorMessages = ["An unknown error occurred."];
-  }
-  return errorMessages;
-};
-
 const createAsyncAuthThunk = (url: string, type: AuthActionType) =>
   createAsyncThunk<
     UserAndToken,
@@ -46,17 +34,17 @@ const createAsyncAuthThunk = (url: string, type: AuthActionType) =>
   >(type, async (credentials, { dispatch, rejectWithValue }) => {
     dispatch(startAuth());
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(credentials)
-      });
+      const response = await postJSON(url, credentials);
 
-      const { userName, email, token, todos } = await handleServerResponse(
-        response
-      );
+      const result = await handleServerResponse(response);
+
+      if (result.isError) {
+        return rejectWithValue(result.errorMessages);
+      } else if (!result.data) {
+        return rejectWithValue([ErrorType.Unknown]);
+      }
+
+      const { userName, token, email, todos } = result.data;
 
       dispatch(setTodos(todos));
 
@@ -67,39 +55,6 @@ const createAsyncAuthThunk = (url: string, type: AuthActionType) =>
       return rejectWithValue(errorMessages);
     }
   });
-
-//   const createAsyncAuthFromTokenThunk = (url: string, type: string) =>
-//   createAsyncThunk<
-//     UserAndToken,
-//     AuthCredentials,
-//     { rejectValue: ErrorMessages }
-//   >(type, async (credentials, { dispatch, rejectWithValue }) => {
-//     dispatch(startAuth());
-//     try {
-//       const response = await fetch(url, {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json"
-//         },
-//         body: JSON.stringify(credentials)
-//       });
-
-//       return await handleServerResponse(response);
-//     } catch (error) {
-//       let errorMessages: ErrorMessages;
-//       if (error instanceof Error) {
-//         errorMessages = [error.message];
-//       } else if (Array.isArray(error)) {
-//         errorMessages = error;
-//       } else if (typeof error === "string") {
-//         errorMessages = [error];
-//       } else {
-//         errorMessages = ["An unknown error occurred."];
-//       }
-
-//       return rejectWithValue(errorMessages);
-//     }
-//   });
 
 export const login = createAsyncAuthThunk(
   `${process.env.REACT_APP_API_URL}/${AuthActionType.LOGIN}`,
@@ -138,13 +93,13 @@ export const authSlice = createSlice({
   }
 });
 
-// async function postJSON(url: string, body: object): Promise<Response> {
-//   return fetch(url, {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(body)
-//   });
-// }
+async function postJSON(url: string, body: AuthCredentials): Promise<Response> {
+  return fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+}
 
 export const { startAuth, logout, clearErrors } = authSlice.actions;
 

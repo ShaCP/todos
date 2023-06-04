@@ -1,20 +1,46 @@
+import { ErrorMessages } from "../../types/ErrorMessages";
 import { ErrorResponse } from "../../types/api/ErrorResponse";
-import { SuccessfulAuthResponse } from "../../types/api/authTypes";
+import {
+  AuthResponseResult,
+  SuccessfulAuthResponse
+} from "../../types/api/authTypes";
 
 export const handleServerResponse = async (
   response: Response
-): Promise<SuccessfulAuthResponse> => {
-  const parsedResponse = await response.json();
+): Promise<AuthResponseResult> => {
+  const result: AuthResponseResult = {
+    isError: false,
+    data: null,
+    errorMessages: []
+  };
+
+  const parsedResponse: unknown = await response.json();
   if (response.ok) {
-    return parsedResponse as SuccessfulAuthResponse;
+    result.data = parsedResponse as SuccessfulAuthResponse;
   } else {
-    if (parsedResponse instanceof Array) {
-      const errors = parsedResponse as ErrorResponse[];
-      const errorDescriptions = errors.map((e) => e.description);
-      return Promise.reject(errorDescriptions);
-    } else {
-      const error = parsedResponse as ErrorResponse;
-      return Promise.reject(error.description);
+    result.isError = true;
+    result.errorMessages = handleErrorResponse(parsedResponse);
+  }
+
+  return result;
+};
+
+const handleErrorResponse = (responseWithErrors: unknown): ErrorMessages => {
+  if (Array.isArray(responseWithErrors)) {
+    const errorDescriptions = responseWithErrors.map((error: ErrorResponse) => {
+      if (typeof error.description === "string" && error.description !== "") {
+        return error.description;
+      } else {
+        return JSON.stringify(error);
+      }
+    });
+    return errorDescriptions;
+  } else {
+    const error = responseWithErrors as ErrorResponse;
+    if (typeof error.description === "string" && error.description !== "") {
+      return [error.description];
     }
+
+    return [JSON.stringify(responseWithErrors)];
   }
 };

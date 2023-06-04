@@ -5,12 +5,17 @@ import { login, clearErrors } from "../../authSlice";
 import styles from "./Login.module.css";
 import { Link } from "react-router-dom";
 import { ErrorDisplay } from "../../../errorDisplay/components/ErrorDisplay/ErrorDisplay";
+import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../../../../app/hooks";
+import { stat } from "fs";
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const dispatch: AppDispatch = useDispatch();
+  const navigate = useNavigate();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   useEffect(
     () => () => {
@@ -19,18 +24,25 @@ export const Login: React.FC = () => {
     []
   );
 
-//   useEffect(
-//     () => {
-//       if (localStorage.getItem("authToken")) {
-//         dispatch(        
-//       }
-//     },
-//     []
-//   );
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/todos");
+      //   resetForm();
+    }
+  }, [isAuthenticated, navigate]);
+
+  //   useEffect(
+  //     () => {
+  //       if (localStorage.getItem("authToken")) {
+  //         dispatch(
+  //       }
+  //     },
+  //     []
+  //   );
 
   const { isLoading, errors } = useSelector((state: RootState) => state.auth);
 
-//   if (authToken) {
+  //   if (authToken) {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
