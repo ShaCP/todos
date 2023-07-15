@@ -16,9 +16,9 @@ import { ErrorType } from "../../constants/errors";
 const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
-  errors: [],
   user: null,
-  authToken: null
+  authToken: null,
+  errors: []
 };
 export enum AuthActionType {
   LOGIN = "auth/login",
@@ -103,4 +103,4 @@ async function postJSON(url: string, body: AuthCredentials): Promise<Response> {
 
 export const { startAuth, logout, clearErrors } = authSlice.actions;
 
-export const authReducer = authSlice.reducer;
+export default authSlice.reducer;

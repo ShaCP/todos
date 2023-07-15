@@ -1,29 +1,34 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../../../app/store';
-import { Todo, addTodo, removeTodo, updateTodo } from '../../todosSlice';
-import styles from './Todos.module.css';
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../../../../app/store";
+import {
+  BaseTodo,
+  Todo,
+  addTodosRequest,
+  removeTodo,
+  updateTodo
+} from "../../todosSlice";
+import styles from "./Todos.module.css";
 
 export const Todos: React.FC = () => {
   const todos = useSelector((state: RootState) => state.todos);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
-  const [titleInput, setTitleInput] = useState('');
-  const [descriptionInput, setDescriptionInput] = useState('');
+  const [titleInput, setTitleInput] = useState("");
+  const [descriptionInput, setDescriptionInput] = useState("");
 
   const handleAddTodo = (event: React.FormEvent) => {
     event.preventDefault();
 
     if (titleInput.trim()) {
-      const newTodo: Todo = {
-        id: Date.now(),
+      const newTodo: BaseTodo = {
         title: titleInput.trim(),
         isCompleted: false,
-        description: descriptionInput.trim(),
+        description: descriptionInput.trim()
       };
-      dispatch(addTodo(newTodo));
-      setTitleInput('');
-      setDescriptionInput('');
+      dispatch(addTodosRequest(newTodo));
+      setTitleInput("");
+      setDescriptionInput("");
     }
   };
 
@@ -71,7 +76,7 @@ export const Todos: React.FC = () => {
               <span
                 className={styles.todoText}
                 style={{
-                  textDecoration: todo.isCompleted ? 'line-through' : 'none',
+                  textDecoration: todo.isCompleted ? "line-through" : "none"
                 }}
               >
                 {todo.title}
