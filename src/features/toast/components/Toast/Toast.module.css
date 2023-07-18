@@ -1,0 +1,24 @@
+.toast {
+  padding: 2px;
+  color: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  margin-bottom: 16px;
+}
+
+.error {
+  background-color: #f44336;
+}
+
+.success {
+  background-color: #4caf50;
+}
+
+.info {
+  background-color: #2196f3;
+}
+
+.message {
+  margin: 0;
+}

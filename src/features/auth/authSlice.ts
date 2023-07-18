@@ -1,5 +1,11 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+  isAnyOf
+} from "@reduxjs/toolkit";
+import {
+  AuthToken,
   LoginCredentials,
   RegisterCredentials
 } from "../../types/api/authTypes";
@@ -12,19 +18,23 @@ import { ErrorMessages } from "../../types/ErrorMessages";
 import { setTodos } from "../todos/todosSlice";
 import { handleError } from "../../utilities/errorHandling";
 import { ErrorType } from "../../constants/errors";
+import { RootState } from "app/store";
+
+export const AUTH_TOKEN_KEY = "authToken";
 
 const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   user: null,
-  authToken: null,
+  [AUTH_TOKEN_KEY]: null,
   errors: []
 };
 export enum AuthActionType {
   LOGIN = "auth/login",
-  REGISTER = "auth/register"
+  REGISTER = "auth/register",
+  LOGIN_WITH_TOKEN = "auth/token-login"
 }
-type AuthCredentials = LoginCredentials | RegisterCredentials;
+type AuthCredentials = LoginCredentials | RegisterCredentials | AuthToken;
 
 const createAsyncAuthThunk = (url: string, type: AuthActionType) =>
   createAsyncThunk<
@@ -34,7 +44,7 @@ const createAsyncAuthThunk = (url: string, type: AuthActionType) =>
   >(type, async (credentials, { dispatch, rejectWithValue }) => {
     dispatch(startAuth());
     try {
-      const response = await postJSON(url, credentials);
+      const response = await authRequest(url, credentials);
 
       const result = await handleServerResponse(response);
 
@@ -49,6 +59,7 @@ const createAsyncAuthThunk = (url: string, type: AuthActionType) =>
       dispatch(setTodos(todos));
 
       const user = { userName, email };
+      localStorage.setItem(AUTH_TOKEN_KEY, token);
       return { user, token };
     } catch (error) {
       const errorMessages = handleError(error);
@@ -65,6 +76,18 @@ export const register = createAsyncAuthThunk(
   `${process.env.REACT_APP_API_URL}/${AuthActionType.REGISTER}`,
   AuthActionType.REGISTER
 );
+
+export const loginWithToken = createAsyncAuthThunk(
+  `${process.env.REACT_APP_API_URL}/${AuthActionType.LOGIN_WITH_TOKEN}`,
+  AuthActionType.LOGIN_WITH_TOKEN
+);
+
+const fulfilledActions = [
+  login.fulfilled,
+  register.fulfilled,
+  loginWithToken.fulfilled
+];
+const rejectedActions = [login.rejected, register.rejected];
 
 export const authSlice = createSlice({
   name: "auth",
@@ -86,20 +109,33 @@ export const authSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(login.fulfilled, handleAuthSuccess);
-    builder.addCase(login.rejected, handleAuthFailure);
-    builder.addCase(register.fulfilled, handleAuthSuccess);
-    builder.addCase(register.rejected, handleAuthFailure);
+    builder
+      .addCase(loginWithToken.rejected, (state) => {
+        state.isLoading = false;
+      })
+      .addMatcher(isAnyOf(...fulfilledActions), handleAuthSuccess)
+      .addMatcher(isAnyOf(...rejectedActions), handleAuthFailure);
   }
 });
 
-async function postJSON(url: string, body: AuthCredentials): Promise<Response> {
+async function authRequest(
+  url: string,
+  credentials: AuthCredentials
+): Promise<Response> {
+  const isTokenRequest = typeof credentials === "string";
   return fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
+    method: isTokenRequest ? "GET" : "POST",
+    headers: isTokenRequest
+      ? { Authorization: `Bearer ${credentials}` }
+      : { "Content-Type": "application/json" },
+    body: isTokenRequest ? undefined : JSON.stringify(credentials)
   });
 }
+
+export const selectUser = createSelector(
+  (state: RootState) => state.auth,
+  (auth) => auth.user
+);
 
 export const { startAuth, logout, clearErrors } = authSlice.actions;
 

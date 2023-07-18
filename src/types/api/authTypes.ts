@@ -1,5 +1,5 @@
-import { Todo } from "../../features/todos/todosSlice";
-import { ErrorMessages } from '../ErrorMessages';
+import { ITodo } from "../../features/todos/todosSlice";
+import { ErrorMessages } from "../ErrorMessages";
 import { User } from "../User";
 
 export interface RegisterCredentials {
@@ -22,11 +22,13 @@ export interface AuthState {
   authToken: string | null;
 }
 
+export type AuthToken = string;
+
 export interface SuccessfulAuthResponse {
   userName: string;
-  token: string;
+  token: AuthToken;
   email: string;
-  todos: Todo[];
+  todos: ITodo[];
 }
 
 export interface UserAndToken {
@@ -36,7 +38,7 @@ export interface UserAndToken {
 
 export interface ResponseResult {
   isError: boolean;
-  errorMessages: ErrorMessages
+  errorMessages: ErrorMessages;
 }
 
 export interface AuthResponseResult extends ResponseResult {

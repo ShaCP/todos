@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../../../app/store";
-import {
-  BaseTodo,
-  Todo,
-  addTodosRequest,
-  removeTodo,
-  updateTodo
-} from "../../todosSlice";
-import styles from "./Todos.module.css";
+import { BaseTodo, addTodoRequest } from "../../todosSlice";
+import componentStyles from "./Todos.module.css";
+import commonStyles from "app/styles/common.module.css";
+import { Todo } from "../Todo/Todo";
+
+const styles = { ...commonStyles, ...componentStyles };
 
 export const Todos: React.FC = () => {
   const todos = useSelector((state: RootState) => state.todos);
@@ -26,19 +24,11 @@ export const Todos: React.FC = () => {
         isCompleted: false,
         description: descriptionInput.trim()
       };
-      dispatch(addTodosRequest(newTodo));
+
+      dispatch(addTodoRequest(newTodo));
       setTitleInput("");
       setDescriptionInput("");
     }
-  };
-
-  const handleRemoveTodo = (id: number) => {
-    dispatch(removeTodo(id));
-  };
-
-  const handleToggleCompleted = (todo: Todo) => {
-    const updatedTodo = { ...todo, isCompleted: !todo.isCompleted };
-    dispatch(updateTodo(updatedTodo));
   };
 
   return (
@@ -59,37 +49,13 @@ export const Todos: React.FC = () => {
           className={styles.todoInput}
           placeholder="Description"
         />
-        <button type="submit" className={styles.addButton}>
+        <button type="submit" className={`${styles.button}`}>
           Add Todo
         </button>
       </form>
       <ul className={styles.todoList}>
         {todos.map((todo) => (
-          <li key={todo.id} className={styles.todoItem}>
-            <input
-              type="checkbox"
-              checked={todo.isCompleted}
-              onChange={() => handleToggleCompleted(todo)}
-              className={styles.todoCheckbox}
-            />
-            <div className={styles.todoContent}>
-              <span
-                className={styles.todoText}
-                style={{
-                  textDecoration: todo.isCompleted ? "line-through" : "none"
-                }}
-              >
-                {todo.title}
-              </span>
-              <p className={styles.todoDescription}>{todo.description}</p>
-            </div>
-            <button
-              onClick={() => handleRemoveTodo(todo.id)}
-              className={styles.removeButton}
-            >
-              Remove
-            </button>
-          </li>
+          <Todo key={todo.id} todo={todo} />
         ))}
       </ul>
     </div>

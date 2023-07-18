@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../../app/store";
+import { AppDispatch, RootState } from "app/store";
 import { login, clearErrors } from "../../authSlice";
 import styles from "./Login.module.css";
-import { Link } from "react-router-dom";
+import commonStyles from "app/styles/common.module.css";
 import { ErrorDisplay } from "../../../errorDisplay/components/ErrorDisplay/ErrorDisplay";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../../../app/hooks";
-import { stat } from "fs";
+import { useAppSelector } from "app/hooks";
 
-export const Login: React.FC = () => {
+type LoginProps = { showRegister: () => void };
+
+export const Login: React.FC<LoginProps> = ({ showRegister }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -21,34 +22,20 @@ export const Login: React.FC = () => {
     () => () => {
       dispatch(clearErrors());
     },
-    []
+    [dispatch]
   );
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/todos");
-      //   resetForm();
+      navigate("/");
     }
   }, [isAuthenticated, navigate]);
 
-  //   useEffect(
-  //     () => {
-  //       if (localStorage.getItem("authToken")) {
-  //         dispatch(
-  //       }
-  //     },
-  //     []
-  //   );
-
   const { isLoading, errors } = useSelector((state: RootState) => state.auth);
-
-  //   if (authToken) {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Implement your logic here to connect with the backend
-    // If successful, update the state with the user's information and auth token
     dispatch(login({ email, password }));
   };
 
@@ -81,9 +68,9 @@ export const Login: React.FC = () => {
         </button>
         <p>
           Don't have an account?{" "}
-          <Link to="/register" className={styles.link}>
+          <button onClick={showRegister} className={commonStyles.buttonLink}>
             Register
-          </Link>
+          </button>
         </p>
         {!!errors.length && <ErrorDisplay errors={errors} />}
       </form>

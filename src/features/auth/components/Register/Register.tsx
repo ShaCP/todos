@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from '../../../../app/hooks';
-import { Link, useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
+import { useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../../../app/store";
 import { register, clearErrors } from "../../authSlice";
 import styles from "./Register.module.css";
 import { ErrorDisplay } from "../../../errorDisplay/components/ErrorDisplay/ErrorDisplay";
+import commonStyles from "app/styles/common.module.css";
 
-export const Register = () => {
+type RegisterProps = { hideRegister: () => void };
+
+export const Register: React.FC<RegisterProps> = ({ hideRegister }) => {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,7 +54,7 @@ export const Register = () => {
       dispatch(clearErrors());
       resetForm();
     },
-    []
+    [dispatch]
   );
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -117,9 +120,9 @@ export const Register = () => {
         </button>
         <p>
           Already have an account?{" "}
-          <Link to="/" className={styles.link}>
+          <button onClick={hideRegister} className={commonStyles.buttonLink}>
             Log In
-          </Link>
+          </button>
         </p>
         {!!errors.length && <ErrorDisplay errors={errors} />}
       </form>

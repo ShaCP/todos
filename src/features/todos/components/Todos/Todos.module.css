@@ -1,96 +1,38 @@
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    background-color: white;
-    border-radius: 4px;
-  }
-  
-  .title {
-    margin-bottom: 1.5rem;
-    text-align: center;
-  }
-  
-  .inputContainer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .todoInput {
-    flex-grow: 1;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .todoInput:first-of-type {
-    margin-right: 0.5rem;
-  }
-  
-  .addButton {
-    padding: 0.5rem 1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    white-space: nowrap; /* Prevent the button text from wrapping */
-  }
-  
-  .addButton:hover {
-    background-color: #0056b3;
-  }
-  
-  .todoList {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .todoItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .todoCheckbox {
-    margin-right: 1rem;
-  }
-  
-  .todoContent {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    text-align: left;
-  }
-  
-  .todoText {
-    font-weight: bold;
-  }
-  
-  .todoDescription {
-    margin: 0;
-    font-size: 0.9em;
-    color: #888;
-    font-weight: normal; /* Update the font weight for description */
-  }
-  
-  .removeButton {
-    padding: 0.5rem 1rem;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 1rem; /* Add margin between the remove button and the todo content */
-  }
-  
-  .removeButton:hover {
-    background-color: #c82333;
-  }
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  border-radius: 4px;
+}
+
+.title {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.inputContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.todoInput {
+  flex-grow: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.todoInput:first-of-type {
+  margin-right: 0.5rem;
+}
+
+.todoList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
