@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "app/store";
 import { login, clearErrors } from "../../authSlice";
 import styles from "./Login.module.css";
-import commonStyles from "app/styles/common.module.css";
+import globalStyles from "styles/global.module.css";
 import { ErrorDisplay } from "../../../errorDisplay/components/ErrorDisplay/ErrorDisplay";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "app/hooks";
@@ -68,7 +68,7 @@ export const Login: React.FC<LoginProps> = ({ showRegister }) => {
         </button>
         <p>
           Don't have an account?{" "}
-          <button onClick={showRegister} className={commonStyles.buttonLink}>
+          <button onClick={showRegister} className={globalStyles.buttonLink}>
             Register
           </button>
         </p>

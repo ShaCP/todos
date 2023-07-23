@@ -1,11 +1,8 @@
 import React from "react";
-import componentStyles from "./NavBar.module.css";
-import commonStyles from "app/styles/common.module.css";
+import globalStyles from "styles/global.module.css";
+import styles from "./NavBar.module.css";
 import { useAppDispatch, useAppSelector } from "../../hooks";
-import { combineStyles } from "utilities/combineStyles";
 import { AUTH_TOKEN_KEY, logout } from "features/auth/authSlice";
-
-const styles = combineStyles([commonStyles, componentStyles]);
 
 const NavBar: React.FC = React.memo(function NavBar() {
   const user = useAppSelector((state) => state.auth.user);
@@ -17,7 +14,10 @@ const NavBar: React.FC = React.memo(function NavBar() {
   };
 
   const logoutButton = user ? (
-    <button className={styles.button} onClick={handleLogout}>
+    <button
+      className={`${globalStyles.button} ${styles.logoutButton}`}
+      onClick={handleLogout}
+    >
       Logout
     </button>
   ) : null;

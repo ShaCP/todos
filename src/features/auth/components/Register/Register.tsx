@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../../../app/store";
 import { register, clearErrors } from "../../authSlice";
 import styles from "./Register.module.css";
+import globalStyles from "styles/global.module.css";
 import { ErrorDisplay } from "../../../errorDisplay/components/ErrorDisplay/ErrorDisplay";
-import commonStyles from "app/styles/common.module.css";
 
 type RegisterProps = { hideRegister: () => void };
 
@@ -120,7 +120,7 @@ export const Register: React.FC<RegisterProps> = ({ hideRegister }) => {
         </button>
         <p>
           Already have an account?{" "}
-          <button onClick={hideRegister} className={commonStyles.buttonLink}>
+          <button onClick={hideRegister} className={globalStyles.buttonLink}>
             Log In
           </button>
         </p>

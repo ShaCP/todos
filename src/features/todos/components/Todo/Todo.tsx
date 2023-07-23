@@ -1,7 +1,9 @@
 import { useDispatch } from "react-redux";
 import { ITodo, removeTodoRequest, updateTodo } from "../../todosSlice";
+import globalStyles from "styles/global.module.css";
 import styles from "./Todo.module.css";
 import { AppDispatch } from "../../../../app/store";
+import classNames from "classnames";
 
 type TodoProps = {
   todo: ITodo;
@@ -19,31 +21,28 @@ export const Todo: React.FC<TodoProps> = ({ todo }: TodoProps) => {
     dispatch(updateTodo(updatedTodo));
   };
 
+  const todoItemClass = classNames(styles.todoItem, {
+    [styles.completed]: todo.isCompleted
+  });
+
   return (
-    <li className={styles.todoItem}>
-      <input
-        type="checkbox"
-        checked={todo.isCompleted}
-        onChange={() => handleToggleCompleted(todo)}
-        className={styles.todoCheckbox}
-      />
-      <div className={styles.todoContent}>
-        <span
-          className={styles.todoText}
-          style={{
-            textDecoration: todo.isCompleted ? "line-through" : "none"
-          }}
-        >
-          {todo.title}
-        </span>
+    <div className={todoItemClass}>
+      <label className={styles.todoContent}>
+        <input
+          type="checkbox"
+          checked={todo.isCompleted}
+          onChange={() => handleToggleCompleted(todo)}
+          className={`${styles.todoCheckbox} ${globalStyles.roundedCheckbox}`}
+        />
+        <span className={`${styles.todoText}`}>{todo.title}</span>
         <p className={styles.todoDescription}>{todo.description}</p>
-      </div>
+      </label>
       <button
         onClick={() => handleRemoveTodo(todo.id)}
         className={styles.removeButton}
       >
-        Remove
+        X
       </button>
-    </li>
+    </div>
   );
 };

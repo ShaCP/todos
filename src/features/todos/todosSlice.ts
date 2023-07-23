@@ -59,6 +59,10 @@ export const addTodoRequest = createAsyncThunk<
       baseTodo
     );
 
+    if (!response.ok) {
+      throw new Error("Failed to add todo");
+    }
+
     const todo = await response.json();
 
     dispatch(addToast({ type: "success", message: "Todo added" }));

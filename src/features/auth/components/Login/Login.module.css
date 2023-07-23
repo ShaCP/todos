@@ -22,7 +22,7 @@
 }
 
 .submitButton {
-  background-color: #007bff;
+  background-color: var(--color-blue-a);
   border: none;
   color: white;
   padding: 0.5rem 1rem;
