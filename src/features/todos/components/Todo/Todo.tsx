@@ -1,5 +1,5 @@
 import { useDispatch } from "react-redux";
-import { ITodo, removeTodoRequest, updateTodo } from "../../todosSlice";
+import { ITodo, removeTodo, updateTodo } from "../../todosSlice";
 import globalStyles from "styles/global.module.css";
 import styles from "./Todo.module.css";
 import { AppDispatch } from "../../../../app/store";
@@ -13,7 +13,7 @@ export const Todo: React.FC<TodoProps> = ({ todo }: TodoProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleRemoveTodo = (id: number) => {
-    dispatch(removeTodoRequest(id));
+    dispatch(removeTodo(id));
   };
 
   const handleToggleCompleted = (todo: ITodo) => {

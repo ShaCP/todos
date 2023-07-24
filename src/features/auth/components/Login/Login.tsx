@@ -61,7 +61,7 @@ export const Login: React.FC<LoginProps> = ({ showRegister }) => {
         />
         <button
           type="submit"
-          className={styles.submitButton}
+          className={globalStyles.submitButton}
           disabled={isLoading}
         >
           {isLoading ? "Loading..." : "Login"}

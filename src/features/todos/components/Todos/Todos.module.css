@@ -24,14 +24,14 @@
   width: 100px;
 }
 
-.todoInput {
+.todoForm .todoInput {
   flex-grow: 1;
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   height: 100%;
   font: inherit;
-  background-color: aliceblue;
+  background-color: #f1f9ff;
   border: 0;
   font-style: italic;
   font-size: 1.3rem;

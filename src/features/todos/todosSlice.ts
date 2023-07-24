@@ -19,9 +19,6 @@ const todosSlice = createSlice({
   name: "todos",
   initialState,
   reducers: {
-    removeTodo: (state, action: PayloadAction<number>) => {
-      return state.filter((todo) => todo.id !== action.payload);
-    },
     updateTodo: (state, action: PayloadAction<ITodo>) => {
       const index = state.findIndex((todo) => todo.id === action.payload.id);
       if (index !== -1) {
@@ -34,16 +31,22 @@ const todosSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(addTodoRequest.fulfilled, (state, { payload: todo }) => {
+      .addCase(addTodo.fulfilled, (state, { payload: todo }) => {
         state.push(todo);
       })
-      .addCase(removeTodoRequest.fulfilled, (state, { payload: todoId }) => {
+      .addCase(removeTodo.fulfilled, (state, { payload: todoId }) => {
         return state.filter((todo) => todo.id !== todoId);
+      })
+      .addCase(updateTodo.fulfilled, (state, { payload: todo }) => {
+        const index = state.findIndex((t) => t.id === todo.id);
+        if (index !== -1) {
+          state[index] = todo;
+        }
       });
   }
 });
 
-export const addTodoRequest = createAsyncThunk<
+export const addTodo = createAsyncThunk<
   ITodo,
   BaseTodo,
   { state: RootState; rejectValue: ErrorMessages }
@@ -75,7 +78,37 @@ export const addTodoRequest = createAsyncThunk<
   }
 });
 
-export const removeTodoRequest = createAsyncThunk<
+export const updateTodo = createAsyncThunk<
+  ITodo,
+  ITodo,
+  { state: RootState; rejectValue: ErrorMessages }
+>("todos/updateTodo", async (todo, { getState, dispatch }) => {
+  try {
+    const authToken = getState().auth.authToken;
+
+    if (!authToken) throw new Error("No auth token");
+
+    const response = await apiUpdateRequest(
+      `${process.env.REACT_APP_API_URL}/todo/${todo.id}`,
+      authToken,
+      todo
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to update todo");
+    }
+
+    dispatch(addToast({ type: "success", message: "Todo updated" }));
+
+    return todo;
+  } catch (error) {
+    const errorMessages = handleError(error);
+    dispatch(addToast({ type: "error", message: errorMessages.join("/n") }));
+    throw error;
+  }
+});
+
+export const removeTodo = createAsyncThunk<
   number,
   number,
   { state: RootState; rejectValue: ErrorMessages }
@@ -115,6 +148,17 @@ function apiAddRequest(url: string, authToken: string, body: BaseTodo) {
   });
 }
 
+function apiUpdateRequest(url: string, authToken: string, body: BaseTodo) {
+  return fetch(url, {
+    body: JSON.stringify(body),
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${authToken}`
+    }
+  });
+}
+
 function apiDeleteRequest(url: string, authToken: string) {
   return fetch(url, {
     method: "DELETE",
@@ -125,6 +169,6 @@ function apiDeleteRequest(url: string, authToken: string) {
   });
 }
 
-export const { removeTodo, updateTodo, setTodos } = todosSlice.actions;
+export const { setTodos } = todosSlice.actions;
 
 export default todosSlice.reducer;

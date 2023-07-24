@@ -6,7 +6,7 @@
 }
 
 .error {
-  color: red;
+  color: var(--color-red-a);
   font-size: 0.875rem;
   margin: 0;
 }

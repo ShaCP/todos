@@ -26,8 +26,12 @@ function concatenateFiles(extension, directoryPath = '.', outputFileName) {
     let concatenatedContent = '';
 
     for (const file of filesToConcatenate) {
+        const fileName = path.basename(file);
         const fileContent = fs.readFileSync(file, 'utf8');
-        concatenatedContent += fileContent;
+
+        // Add a comment block at the top of the content with the file name
+        concatenatedContent += `/* File: ${fileName} */\n`;
+        concatenatedContent += fileContent + '\n';
     }
 
     const outputFile = outputFileName.endsWith(`.${extension}`)
@@ -49,6 +53,6 @@ const args = process.argv.slice(2);
 // Usage example: node concatFiles.js css all-styles
 // args[0]: 'css' - Extension
 // args[1]: 'all-styles' - Output File Name
-const [extension, outputFileName] = args;
+const [extension, directoryPath, outputFileName] = args;
 
-concatenateFiles(extension, '.', outputFileName);
+concatenateFiles(extension, directoryPath, outputFileName);

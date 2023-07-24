@@ -1,21 +1,22 @@
 .navBar {
   height: 60px;
   max-width: 100%;
-  background-color: #007bff;
+  background-color: var(--color-blue-a);
   color: white;
   display: flex;
-  justify-content: right;
+  justify-content: flex-end;
   align-items: center;
-  padding: 0 1rem;
-  font-size: 20px;
+  padding: 0 var(--padding-medium);
+  font-size: var(--font-size-large);
 }
 
 .navBar ul {
   list-style: none;
   display: flex;
   gap: 20px;
+  align-items: center;
 }
 
 .logoutButton {
-  background-color: black;
+  background-color: var(--color-grey-a);
 }

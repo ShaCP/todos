@@ -7,17 +7,51 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+:root {
+  /* colors */
+  --color-blue-a: #4098d7;
+  --color-green-a: #58d68d;
+  --color-red-a: #ec7063;
+  --color-grey-a: #6c757d;
+
+  /* spacing */
+  --padding-small: 0.5rem;
+  --padding-medium: 1rem;
+  --padding-large: 2rem;
+
+  /* font sizes */
+  --font-size-small: 0.875rem;
+  --font-size-medium: 1rem;
+  --font-size-large: 1.5rem;
 }
 
-:root {
-  --color-blue-a: #007bff;
-  --color-green-a: #28a745;
-  --color-red-a: #dc3545;
+/* input fields */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"] {
+  height: 2rem;
+  padding: 0.5rem; /* Provide more padding space */
+  background-color: #f1f1f1; /* Use a slightly lighter shade to reduce visual contrast */
+  border: none; /* Remove the border */
+  border-radius: 4px; /* Add a border radius to make the inputs look more soft */
+  font-size: 1rem; /* Make sure the font-size is accessible */
+  width: 100%; /* Make the input fields responsive */
+  box-sizing: border-box; /* To make sure padding doesn't increase the total width */
+  color: #333; /* Make the text color a bit darker for better readability */
 }
+
+input:focus {
+  outline: none; /* Remove the browser default outline */
+  box-shadow: 0 0 5px rgba(64, 152, 215, 0.5); /* Add a glow effect on focus */
+}
+
+input::placeholder {
+  color: #aaa; /* Lighten the placeholder text color */
+}
+
+/* general focus styling */
 
 :focus-visible {
-  outline: #8dc4ff auto 1px;
+  outline: #ffb703 auto 1px;
 }

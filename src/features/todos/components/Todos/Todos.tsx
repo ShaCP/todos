@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../../../../app/store";
-import { BaseTodo, addTodoRequest } from "../../todosSlice";
+import { BaseTodo, addTodo } from "../../todosSlice";
 import globalStyles from "styles/global.module.css";
 import styles from "./Todos.module.css";
 import { Todo } from "../Todo/Todo";
@@ -24,16 +24,14 @@ export const Todos: React.FC = () => {
         description: descriptionInput.trim()
       };
 
-      dispatch(addTodoRequest(newTodo));
+      dispatch(addTodo(newTodo));
       setTitleInput("");
       setDescriptionInput("");
     }
   };
 
-  const addTodoEnabled = titleInput.trim().length > 0;
-  const addTodoClass = classNames([globalStyles.button], [styles.addTodo], {
-    [globalStyles.disabledButton]: !addTodoEnabled
-  });
+  const addDisabled = !(titleInput.trim().length > 0);
+  const addTodoClass = classNames([globalStyles.button], [styles.addTodo]);
 
   return (
     <div className={styles.container}>
@@ -44,7 +42,7 @@ export const Todos: React.FC = () => {
           value={titleInput}
           onChange={(e) => setTitleInput(e.target.value)}
           className={styles.todoInput}
-          placeholder="What needs to be done?"
+          placeholder="I need to..."
         />
         {/* <input
           type="text"
@@ -53,7 +51,7 @@ export const Todos: React.FC = () => {
           className={styles.todoInput}
           placeholder="Description"
         /> */}
-        <button type="submit" className={addTodoClass}>
+        <button type="submit" disabled={addDisabled} className={addTodoClass}>
           Add
         </button>
       </form>

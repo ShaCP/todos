@@ -113,7 +113,7 @@ export const Register: React.FC<RegisterProps> = ({ hideRegister }) => {
         />
         <button
           type="submit"
-          className={styles.submitButton}
+          className={globalStyles.submitButton}
           disabled={isLoading}
         >
           {isLoading ? "Loading..." : "Register"}
