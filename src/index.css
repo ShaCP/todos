@@ -36,7 +36,7 @@ input[type="number"] {
   border: none; /* Remove the border */
   border-radius: 4px; /* Add a border radius to make the inputs look more soft */
   font-size: 1rem; /* Make sure the font-size is accessible */
-  width: 100%; /* Make the input fields responsive */
+  /* width: 100%; Make the input fields responsive */
   box-sizing: border-box; /* To make sure padding doesn't increase the total width */
   color: #333; /* Make the text color a bit darker for better readability */
 }
