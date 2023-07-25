@@ -23,6 +23,7 @@ import { RootState } from "app/store";
 export const AUTH_TOKEN_KEY = "authToken";
 
 const initialState: AuthState = {
+  showLogin: true,
   isAuthenticated: false,
   isLoading: false,
   user: null,
@@ -106,6 +107,9 @@ export const authSlice = createSlice({
     },
     clearErrors: (state) => {
       state.errors = [];
+    },
+    showLogin(state, action) {
+      state.showLogin = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -137,6 +141,6 @@ export const selectUser = createSelector(
   (auth) => auth.user
 );
 
-export const { startAuth, logout, clearErrors } = authSlice.actions;
+export const { startAuth, logout, clearErrors, showLogin } = authSlice.actions;
 
 export default authSlice.reducer;

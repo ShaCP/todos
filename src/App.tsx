@@ -4,27 +4,22 @@ import { Login } from "./features/auth/components/Login/Login";
 import { Register } from "./features/auth/components/Register/Register";
 import { ToastContainer } from "./features/toast/components/ToastContainer/ToastContainer";
 import { NavBar } from "./app/components/NavBar/NavBar";
-import { useAuthenticate } from "app/hooks";
-import { useState } from "react";
+import { useAppSelector, useAuthenticate } from "app/hooks";
 
 function App() {
   const { isAuthenticated, isLoading, attemptedAuth } = useAuthenticate();
-  const [showRegister, setShowRegister] = useState(false);
+  const showLogin = useAppSelector((state) => state.auth.showLogin);
 
-  const handleShowRegister = (shouldShow: boolean) => () => {
-    setShowRegister(shouldShow);
-  };
+  let home = <div>Loading...</div>;
 
-  let home;
-
-  if (isLoading || !attemptedAuth) {
-    home = null;
-  } else if (isAuthenticated) {
-    home = <Todos />;
-  } else if (showRegister) {
-    home = <Register hideRegister={handleShowRegister(false)} />;
-  } else {
-    home = <Login showRegister={handleShowRegister(true)} />;
+  if (!isLoading && attemptedAuth) {
+    if (isAuthenticated) {
+      home = <Todos />;
+    } else if (showLogin) {
+      home = <Login />;
+    } else {
+      home = <Register />;
+    }
   }
 
   return (

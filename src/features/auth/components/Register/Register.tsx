@@ -2,14 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import { useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../../../app/store";
-import { register, clearErrors } from "../../authSlice";
+import { register, clearErrors, showLogin } from "../../authSlice";
 import styles from "./Register.module.css";
 import globalStyles from "styles/global.module.css";
 import { ErrorDisplay } from "../../../errorDisplay/components/ErrorDisplay/ErrorDisplay";
 
-type RegisterProps = { hideRegister: () => void };
-
-export const Register: React.FC<RegisterProps> = ({ hideRegister }) => {
+export const Register: React.FC = () => {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,7 +41,7 @@ export const Register: React.FC<RegisterProps> = ({ hideRegister }) => {
   useEffect(() => {
     if (confirmPassword?.length > 0 && confirmPassword !== password) {
       confirmPasswordRef.current?.setCustomValidity("Passwords do not match");
-      confirmPasswordRef.current?.reportValidity();
+      //   confirmPasswordRef.current?.reportValidity(); <-- this will report it on keypress but will switch the focus to the confirm password field, not good UX
     } else {
       confirmPasswordRef.current?.setCustomValidity("");
     }
@@ -52,7 +50,7 @@ export const Register: React.FC<RegisterProps> = ({ hideRegister }) => {
   useEffect(
     () => () => {
       dispatch(clearErrors());
-      resetForm();
+      //   resetForm();
     },
     [dispatch]
   );
@@ -120,7 +118,10 @@ export const Register: React.FC<RegisterProps> = ({ hideRegister }) => {
         </button>
         <p>
           Already have an account?{" "}
-          <button onClick={hideRegister} className={globalStyles.buttonLink}>
+          <button
+            onClick={() => dispatch(showLogin(true))}
+            className={globalStyles.buttonLink}
+          >
             Log In
           </button>
         </p>

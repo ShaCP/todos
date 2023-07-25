@@ -15,6 +15,7 @@ export interface LoginCredentials {
 }
 
 export interface AuthState {
+  showLogin: boolean;
   isAuthenticated: boolean;
   isLoading: boolean;
   errors: ErrorMessages;
